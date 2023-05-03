@@ -13,12 +13,12 @@ public class PronosticoTest {
 
 	private Equipo equipo1;
 	private Equipo equipo2;
+	private String valPartido = "1";
 
 	@Before
 	public void setUp() {
 		this.equipo1 = new Equipo("Argentina");
 		this.equipo2 = new Equipo("Brasil");
-		
 	}
 	
 	@Test
@@ -28,9 +28,8 @@ public class PronosticoTest {
 		Partido partido = new Partido(this.equipo1,
 				this.equipo2, 2, 3);
 		Pronostico pronostico = new Pronostico(partido, this.equipo1, EnumResultado.PERDEDOR);
-		
 		// Procesar
-		int puntos = pronostico.puntos();
+		int puntos = pronostico.puntos(this.valPartido);
 		
 		// Evaluar
 		
@@ -48,7 +47,7 @@ public class PronosticoTest {
 		Pronostico pronostico = new Pronostico(partido, this.equipo1, EnumResultado.EMPATE);
 		
 		// Procesar
-		int puntos = pronostico.puntos();
+		int puntos = pronostico.puntos(this.valPartido);
 		
 		// Evaluar
 		

@@ -1,7 +1,6 @@
 package organizacion.entity;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class Apostador {
@@ -11,7 +10,7 @@ public class Apostador {
 	private List<Ronda> rondas;
 	private Integer bonusXRonda;
 	private Integer bonusXFase;
-	
+
 	public Apostador(String nombre) {
 		super();
 		this.nombre = nombre;
@@ -28,48 +27,21 @@ public class Apostador {
 		return bonusXFase;
 	}
 
-	public void setBonusXFase(Integer bonusXFase) {
-		this.bonusXFase = bonusXFase;
-	}
-
-	public void setBonusXRonda(Integer bonusXRonda) {
-		this.bonusXRonda = bonusXRonda;
-	}
-
-	public List<Ronda> getRondas() {
-		return rondas;
-	}
-
-	public void setRondas(List<Ronda> rondas) {
-		this.rondas = rondas;
-	}
-
-	public String getNombre() {
-		return nombre;
-	}
-
-	public void setNombre(String nombre) {
-		this.nombre = nombre;
-	}
 
 	public List<Pronostico> getPronosticos() {
 		return pronosticos;
 	}
 
-	public void setPronosticos(List<Pronostico> pronosticos) {
-		this.pronosticos = pronosticos;
-	}
 
 	public void addPronostico(Pronostico pronostico){
 		this.pronosticos.add(pronostico);
 	}
 
-	public void addRonda(Ronda ronda) { this.rondas.add(ronda); }
 
-	public int puntosPorPronostico() {
+	public int puntosPorPronostico(String valorPartido) {
 		int puntos = 0;
 		for (Pronostico pronostico : pronosticos) {
-			puntos += pronostico.puntos();
+			puntos += pronostico.puntos(valorPartido);
 		}
 		return puntos;
 	}
@@ -80,40 +52,39 @@ public class Apostador {
 
 	public void incBonusFase(int m) { bonusXFase += m; }
 
-	public int puntosTotales() {
-		return this.puntosPorPronostico() + this.bonusXRonda + this.bonusXFase;
+	public int puntosTotales(String valorPartido) {
+		return this.puntosPorPronostico(valorPartido) + this.bonusXRonda + this.bonusXFase;
 	}
 
-	public void calcularBonusXRondas(Apuesta apuestas, Resultado fixture, String apostador ) {
-		//for (String nombreJugador : apuestas.getApostadores().keySet()) {
+	public void calcularBonusXRondas(Apuesta apuestas, Resultado fixture, String apostador,String valorPartido,String valorRonda ) {
+			int bonusRonda = Integer.parseInt(valorRonda);
+		   	//for (String nombreJugador : apuestas.getApostadores().keySet()) {
 			for (Ronda ronda : fixture.rondas()) {
 				int puntosDisponiblesRonda = ronda.getPartidos().size();
 				List<Pronostico> varapuestas = apuestas.getApostadores().get(apostador).getPronosticos();
-				boolean cumplioRonda = ronda.acertoTodos(varapuestas);
+				boolean cumplioRonda = ronda.acertoTodos(varapuestas,valorPartido);
 				if (cumplioRonda) {
-					apuestas.getApostadores().get(apostador).incBonusRonda(2);
+					apuestas.getApostadores().get(apostador).incBonusRonda(bonusRonda);
 				}
 			}
-		//}
 	}
 
-	public void calcularBonusXFases(Apuesta apuestas, Resultado fixture,String apostador ) {
-		//for (String nombreJugador : apuestas.getApostadores().keySet()) {
+	public void calcularBonusXFases(Apuesta apuestas, Resultado fixture, String apostador,String puntosPartido, String puntosFase) {
+		int valorFase = Integer.parseInt(puntosFase);
 			for (Fase fase : fixture.fases()) {
 				int puntosDisponiblesFase = fase.getRondas().size();
 				int puntosObtenidosEnFase=0;
 				for (Ronda ronda : fase.getRondas().values()) {
 					List<Pronostico> varapuestas = apuestas.getApostadores().get(apostador).getPronosticos();
-					boolean cumplioRonda = ronda.acertoTodos(varapuestas);
+					boolean cumplioRonda = ronda.acertoTodos(varapuestas,puntosPartido);
 					if (cumplioRonda) {
 						puntosObtenidosEnFase = puntosObtenidosEnFase + 1;
 					}
 				}
 				if((puntosDisponiblesFase) == (puntosObtenidosEnFase)){
-					apuestas.getApostadores().get(apostador).incBonusFase(3);
+					apuestas.getApostadores().get(apostador).incBonusFase(valorFase);
 				}
 			}
-		//}
 	}
 
 }

@@ -19,37 +19,23 @@ public class Ronda {
 		return numero;
 	}
 
-	public void setNumero(Integer numero) {
-		this.numero = numero;
-	}
 
 	public List<Partido> getPartidos() {
 		return partidos;
 	}
 
-	public void setPartidos(List<Partido> partidos) {
-		this.partidos = partidos;
-	}
-
-	public Fase getFase() {
-		return fase;
-	}
-
-	public void setFase(Fase fase) {
-		this.fase = fase;
-	}
 
 	public void addPartido(Partido partido) {
 		this.partidos.add(partido);
 	}
 
-	public boolean acertoTodos(List<Pronostico> apuestas) {
+	public boolean acertoTodos(List<Pronostico> apuestas, String valorPartido) {
 		int puntosDisponiblesRonda = this.partidos.size();
 		int puntosObtenidosEnRonda = 0;
 		
 		for (Pronostico pronostico : apuestas) {
 			if(pronostico.getPartido().getRonda().getNumero().equals(this.numero)) {
-				puntosObtenidosEnRonda += pronostico.puntos();
+				puntosObtenidosEnRonda += pronostico.puntos(valorPartido);
 			}
 		}
 		return puntosDisponiblesRonda == puntosObtenidosEnRonda;

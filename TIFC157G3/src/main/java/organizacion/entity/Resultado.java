@@ -10,7 +10,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 import organizacion.exceptions.ArchResultadoException;
+import organizacion.exceptions.GolesNoValidosException;
 
 public class Resultado {
 
@@ -33,32 +35,6 @@ public class Resultado {
 		return partidos;
 	}
 
-	public void setPartidos(Collection<Partido> partidos) {
-		this.partidos = partidos;
-	}
-
-	public Map<Integer, Ronda> getRondas() {
-		return rondas;
-	}
-
-	public Collection<Ronda> getRondi() {
-		return rondas.values();
-	}
-
-	public void setRondas(Map<Integer, Ronda> rondas) {
-		this.rondas = rondas;
-	}
-
-
-	public Map<Integer, Fase> getFases() {
-		return fases;
-	}
-
-	public void setFases(Map<Integer, Fase> fases) {
-		this.fases = fases;
-	}
-
-
 	//	CARGA DE RESULTADOS Y RONDAS
 	public void cargarResultados() throws ArchResultadoException {
 		Path pathResultados = Paths.get(this.archivoCsv);
@@ -75,29 +51,33 @@ public class Resultado {
 				primera = false;
 			} else {
 				String[] campos = lineaResultado.split(",");
-				Partido partido = crearPartidoDeCampos(campos);
-				int nroRonda = Integer.parseInt(campos[0]);
-				int nroFase = Integer.parseInt(campos[5]);
-				Fase fase = null;
-				Ronda ronda = null;
+				if (campos[2].matches("[0-9]+") && campos[3].matches("[0-9+]")) {
+					Partido partido = crearPartidoDeCampos(campos);
+					int nroRonda = Integer.parseInt(campos[0]);
+					int nroFase = Integer.parseInt(campos[5]);
+					Fase fase = null;
+					Ronda ronda = null;
 
-				if (!fases.containsKey(nroFase) ) {
-					fase = new Fase(nroFase);
-					fases.put(nroFase, fase);
-				}else{
-					fase = fases.get(nroFase);
-				}
+					if (!fases.containsKey(nroFase)) {
+						fase = new Fase(nroFase);
+						fases.put(nroFase, fase);
+					} else {
+						fase = fases.get(nroFase);
+					}
 
-				if (!rondas.containsKey(nroRonda)) {
-					ronda = new Ronda(nroRonda);
-					rondas.put(nroRonda, ronda);
-				} else {
-					ronda = rondas.get(nroRonda);
+					if (!rondas.containsKey(nroRonda)) {
+						ronda = new Ronda(nroRonda);
+						rondas.put(nroRonda, ronda);
+					} else {
+						ronda = rondas.get(nroRonda);
+					}
+					ronda.addPartido(partido);
+					fase.addRonda(nroRonda, ronda);
+					partido.setRonda(ronda);
+					partidos.add(partido);
+				}else {
+					throw new GolesNoValidosException();
 				}
-				ronda.addPartido(partido);
-				fase.addRonda(nroRonda,ronda);
-				partido.setRonda(ronda);
-				partidos.add(partido);
 			}
 		}
 	}
@@ -108,46 +88,22 @@ public class Resultado {
 		Partido partido = new Partido(equipo1, equipo2);
 		partido.setGolesEq1(Integer.parseInt(campos[2]));
 		partido.setGolesEq2(Integer.parseInt(campos[3]));
+
 		return partido;
 	}
 
-	public void mostrarResultados(Apuesta apuestas, Resultado fixture) {
+
+	public void mostrarResultados(Apuesta apuestas, Resultado fixture, String puntosPartidos,String puntosRonda,String puntosFase) {
 		for (String jugador : apuestas.getApostadores().keySet()) {
-			apuestas.getApostadores().get(jugador).calcularBonusXRondas(apuestas, fixture, jugador);
-			apuestas.getApostadores().get(jugador).calcularBonusXFases(apuestas, fixture, jugador);
+			apuestas.getApostadores().get(jugador).calcularBonusXRondas(apuestas, fixture, jugador,puntosPartidos,puntosRonda);
+			apuestas.getApostadores().get(jugador).calcularBonusXFases(apuestas, fixture, jugador,puntosPartidos,puntosFase);
 			System.out.println("\nLos puntos obtenidos por el jugador  " + jugador + "  son:");
-			System.out.println("Puntos por partidos.... " + apuestas.getApostadores().get(jugador).puntosPorPronostico());
+			System.out.println("Puntos por partidos.... " + apuestas.getApostadores().get(jugador).puntosPorPronostico(puntosPartidos));
 			System.out.println("Bonus por ronda........ " + apuestas.getApostadores().get(jugador).getBonusXRonda());
 			System.out.println("Bonus por fase......... " + apuestas.getApostadores().get(jugador).getBonusXFase());
-			System.out.println("Total de puntos........ " + apuestas.getApostadores().get(jugador).puntosTotales());
+			System.out.println("Total de puntos........ " + apuestas.getApostadores().get(jugador).puntosTotales(puntosPartidos));
 		}
 	}
-
-
-	/*public Partido partidoDe(List parti2,Equipo equipoa, Equipo equipob)
-            throws PartidoNoEncontradoException {
-
-        for (Partido partidoCol : parti2) {
-            System.out.println(partidoCol.getEquipo1().getNombre());
-
-            if (partidoCol.getEquipo1().getNombre(
-            ).equals(equipoa.getNombre())
-                    && partidoCol.getEquipo2().getNombre(
-            ).equals(equipob.getNombre())) {
-
-                return partidoCol;
-
-            }
-        }
-        throw new PartidoNoEncontradoException(equipoa,equipob);
-    }
-*/
-	/*public void mostrarpartidos(){
-		for (Partido var:partidos) {
-			System.out.println(var.getEquipo1().getNombre());
-		}
-
-	}*/
 
 	public Collection<Ronda> rondas() {
 		return rondas.values();

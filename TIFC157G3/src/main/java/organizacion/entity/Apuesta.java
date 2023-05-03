@@ -1,36 +1,27 @@
 package organizacion.entity;
 
-import organizacion.datasource.Conexion;
 import organizacion.exceptions.ArchResultadoException;
 import java.sql.*;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
 
+
 import static organizacion.datasource.ConectorMySQL.*;
 
 public class Apuesta {
 
-    private String archivoCsv;
+
     private Map<String,Apostador> apostadores;
     private Collection<Pronostico> apuestas;
     private Collection<Partido> partidos;
-    private Collection<Ronda> rondas;
 
-
-    public Apuesta(String archivoCsv,Collection partidos) {
-        this.archivoCsv = archivoCsv;
+    public Apuesta(Collection partidos) {
         this.apuestas = new ArrayList<>();
         this.apostadores = new HashMap<>();
-        //this.partidos= new ArrayList<>();
-        //this.rondas=new ArrayList<>();
         this.partidos = partidos;
-        //this.rondas = rondas;
+
 
     }
 
@@ -38,25 +29,11 @@ public class Apuesta {
         return partidos;
     }
 
-    public void setPartidos(Collection<Partido> partidos) {
-        this.partidos = partidos;
-    }
 
     public Map<String, Apostador> getApostadores() {
         return apostadores;
     }
 
-    public void setApostadores(Map<String, Apostador> apostadores) {
-        this.apostadores = apostadores;
-    }
-
-    public Collection<Pronostico> getApuestas() {
-        return apuestas;
-    }
-
-    public void setApuestas(Collection<Pronostico> apuestas) {
-        this.apuestas = apuestas;
-    }
 
     public void cargarApuestas() throws ArchResultadoException {
         Connection conn = null;
@@ -77,7 +54,7 @@ public class Apuesta {
             String sql;
             sql = "SELECT * FROM apuestas.pronosticos";
 
-            //En la variable resultado obtendremos las distintas filas que nos devolvió la base
+            //En la variable rs obtenemos las distintas filas que nos devolvió la base
             ResultSet rs = st.executeQuery(sql);
             Partido partido = null;
             // Obtener las distintas filas de la consulta
@@ -123,10 +100,11 @@ public class Apuesta {
                 }
                 apostador.addPronostico(pronostico);
             }
-            // Esto se utiliza par cerrar la conexión con la base de datos
+            // Cerrar la conexión con la base de datos
             rs.close();
             st.close();
             st.close();
+            System.out.println("La Conexion Cerro con Exito");
         } catch (SQLException se) {
             // Execpción ante problemas de conexión
             se.printStackTrace();
@@ -140,68 +118,6 @@ public class Apuesta {
         }
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-        /*
-        Path pathPronostico = Paths.get(this.archivoCsv);
-        List<String> lineasPronostico = null;
-                lineasPronostico = Files.readAllLines(pathPronostico);
-        } catch (IOException | SQLException e) {
-            System.out.println("No se pudo leer la linea de pronosticos...");
-            System.out.println(e.getMessage());
-        }
-
-        boolean primera = true;
-        Partido partido = null;
-
-        for (String lineaPronostico : lineasPronostico) {
-            if (primera) {
-                primera = false;
-            } else {
-                String[] campos = lineaPronostico.split(",");
-                Equipo equipo1 = new Equipo(campos[1]);
-                Equipo equipo2 = new Equipo(campos[5]);
-                partido = partidoDe(equipo1,equipo2);
-                Equipo equipo = null;
-                EnumResultado resultado = null;
-                if("X".equals(campos[2])) {
-                    equipo = equipo1;
-                    resultado = EnumResultado.GANADOR;
-                }
-                if("X".equals(campos[3])) {
-                    equipo = equipo1;
-                    resultado = EnumResultado.EMPATE;
-                }
-                if("X".equals(campos[4])) {
-                    equipo = equipo1;
-                    resultado = EnumResultado.PERDEDOR;
-                }
-
-                Pronostico pronostico = new Pronostico(partido, equipo, resultado);
-                apuestas.add(pronostico);
-
-                String nombreApostador =campos[0];
-                Apostador apostador = null;
-                if(apostadores.containsKey(nombreApostador)) {
-                    apostador = apostadores.get(nombreApostador);
-
-                } else {
-                    apostador = new Apostador(nombreApostador);
-                    apostadores.put(nombreApostador, apostador);
-                }
-                apostador.addPronostico(pronostico);
-            }
-        }*/
     }
     private Partido partidoDe(Equipo equipo1,Equipo equipo2){
         Partido partido = new Partido();
@@ -213,13 +129,9 @@ public class Apuesta {
             ).equals(equipo2.getNombre())) {
 
                 partido = partidoCol;
-
-
             }
         }
         return partido;
     }
-
-
 }
 

@@ -1,13 +1,23 @@
 package organizacion;
 
-import organizacion.datasource.Conexion;
+import organizacion.setting.SettingPuntos;
 import organizacion.entity.*;
 import organizacion.exceptions.ArchResultadoException;
-
-import java.util.*;
+import organizacion.exceptions.ArchSeteoException;
 
 public class App{
     public static void main( String[] args ) {
+
+        SettingPuntos seteo =new SettingPuntos(args[2]);
+        try {
+            seteo.cargarSeteo();
+        } catch (ArchSeteoException e) {
+            System.out.println("No se pudo leer el archivo de resultados: "
+                    + e.getArchivoCsv());
+            System.out.println(e.getMessage());
+            // System.exit(1);
+        }
+
 
 //---------------------------------------- CARGA DE PARTIDOS , RONDAS Y FASES ------------------------------------------
 
@@ -23,7 +33,7 @@ public class App{
 
 //---------------------------------------- CARGA DE PRONOSTICOS Y APOSTADORES ------------------------------------------
 
-        Apuesta apuestas = new Apuesta(args[1],fixture.getPartidos());
+        Apuesta apuestas = new Apuesta(fixture.getPartidos());
         try {
             apuestas.cargarApuestas();
         } catch (ArchResultadoException e) {
@@ -34,7 +44,7 @@ public class App{
 
 //--------------------------------------- CALCULAR Y MOSTRAR PUNTOS X APOSTADOR ----------------------------------------
 
-        fixture.mostrarResultados(apuestas,fixture);
+        fixture.mostrarResultados(apuestas,fixture,seteo.getPuntosPartido(),seteo.getPuntosRonda(),seteo.getPuntosFase());
 
     }
 

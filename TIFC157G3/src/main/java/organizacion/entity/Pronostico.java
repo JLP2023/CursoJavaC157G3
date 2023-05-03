@@ -20,20 +20,14 @@ public class Pronostico {
 		return this.equipo;
 	}
 
-	public EnumResultado getResultado() {
-		return this.resultado;
-	}
-
-	public int puntos() {
+	public int puntos(String valorPartido) {
 		// this.resultado -> pred
 		EnumResultado resultadoReal = this.partido.resultado(
 				this.equipo);
 		if (this.resultado.equals(resultadoReal)) {
-			return 1;
+			return Integer.parseInt(valorPartido);
 		} else {
 			return 0;
 		}
-
 	}
-
 }
