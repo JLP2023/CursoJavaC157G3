@@ -8,11 +8,12 @@ import organizacion.exceptions.ArchSeteoException;
 public class App{
     public static void main( String[] args ) {
 
+//---------------------------------------CARGA VALOR DE LOS PUNTOS POR ACIERTOS-----------------------------------------
         SettingPuntos seteo =new SettingPuntos(args[2]);
         try {
             seteo.cargarSeteo();
         } catch (ArchSeteoException e) {
-            System.out.println("No se pudo leer el archivo de resultados: "
+            System.out.println("No se pudo leer el archivo  Setting:  "
                     + e.getArchivoCsv());
             System.out.println(e.getMessage());
             // System.exit(1);
@@ -37,7 +38,7 @@ public class App{
         try {
             apuestas.cargarApuestas();
         } catch (ArchResultadoException e) {
-            System.out.println("No se pudo leer el archivo de resultados: "
+            System.out.println("No se pudo leer el archivo de pronosticos: "
                     + e.getArchivoCsv());
             System.out.println(e.getMessage());
         }
